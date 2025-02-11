@@ -29,7 +29,7 @@ dependencies {
 	implementation("org.postgresql:postgresql:42.7.3")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.3.2")
 	implementation("org.springframework.boot:spring-boot-starter-jdbc:3.3.2")
-
+	//lombok
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
