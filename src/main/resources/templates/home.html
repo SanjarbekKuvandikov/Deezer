@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qo‘shiqlar</title>
+    <link rel="stylesheet" href="/css/home_styles.css">
+</head>
+<body>
+
+<div class="container">
+<h1>Qo‘shiq qidirish</h1>
+    <div class="search-box">
+<input type="text" id="songQuery" placeholder="Qo‘shiq nomi">
+<button onclick="searchSong()">Qidirish</button>
+    </div>
+
+<h2>Natijalar</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Qo‘shiq</th>
+        <th>Qo‘shiqchi</th>
+        <th>MP3 URL</th>
+        <th>Saqlash</th>
+    </tr>
+    </thead>
+    <tbody id="songTable"></tbody>
+</table>
+</div>
+<script>
+    async function searchSong() {
+        const query = document.getElementById("songQuery").value;
+        const response = await fetch(`/songs/search?query=${query}`, { method: "POST" });
+        const song = await response.json();
+
+        if (song) {
+            const row = `<tr>
+                    <td>${song.title}</td>
+                    <td>${song.artist}</td>
+                    <td><input type="text" id="url-${song.id}" placeholder="MP3 URL kiriting"></td>
+                    <td><button onclick="saveUrl(${song.id})">Saqlash</button></td>
+                </tr>`;
+            document.getElementById("songTable").innerHTML += row;
+        }
+    }
+
+    async function saveUrl(songId) {
+        const url = document.getElementById(`url-${songId}`).value;
+        await fetch(`/songs/${songId}?url=${encodeURIComponent(url)}`, { method: "PUT" });
+        alert("URL saqlandi!");
+    }
+</script>
+</body>
+</html>

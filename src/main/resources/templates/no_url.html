@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL qo‘shish</title>
+    <link rel="stylesheet" href="/css/url_styles.css">
+</head>
+<body>
+
+<div class="container">
+<h1>URL yo‘q bo‘lgan qo‘shiqlar</h1>
+<button onclick="fetchSongsWithoutUrl()">Yangilash</button>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Qo‘shiq</th>
+        <th>Qo‘shiqchi</th>
+        <th>Yangi URL</th>
+        <th>Saqlash</th>
+    </tr>
+    </thead>
+    <tbody id="songsTable"></tbody>
+</table>
+</div>
+<script>
+    async function fetchSongsWithoutUrl() {
+        const response = await fetch("/songs/no-url");
+        const songs = await response.json();
+        document.getElementById("songsTable").innerHTML = "";
+        songs.forEach(song => {
+            const row = `<tr>
+                <td>${song.id}</td>
+                <td>${song.title}</td>
+                <td>${song.artist}</td>
+                <td><input type="text" id="url-${song.id}" placeholder="MP3 URL kiriting"></td>
+                <td><button onclick="saveUrl(${song.id})">Saqlash</button></td>
+            </tr>`;
+            document.getElementById("songsTable").innerHTML += row;
+        });
+    }
+
+    async function saveUrl(songId) {
+        const newUrl = document.getElementById(`url-${songId}`).value;
+        await fetch(`/songs/${songId}?url=${encodeURIComponent(newUrl)}`, { method: "PUT" });
+        alert("URL saqlandi!");
+        fetchSongsWithoutUrl();
+    }
+
+    fetchSongsWithoutUrl();
+</script>
+</body>
+</html>

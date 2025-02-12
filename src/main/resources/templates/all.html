@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qo‘shiqlar</title>
+    <link rel="stylesheet" href="/css/all_styles.css">
+</head>
+<body>
+
+<div class="container">
+<h1 class="title">Qo‘shiq ro‘yxati</h1>
+    <div class="buttons">
+<button class="btn refresh-btn" onclick="fetchSongs()">Yangilash</button>
+<button class="btn error-btn" onclick="window.location.href='/no_url'">URL yo‘qlarni ko‘rish</button>
+</div>
+
+    <div class="table-container">
+        <table class="song-table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Qo‘shiq</th>
+        <th>Qo‘shiqchi</th>
+        <th>URL</th>
+    </tr>
+    </thead>
+    <tbody id="songsTable"></tbody>
+</table>
+    </div>
+</div>
+
+<script>
+    async function fetchSongs() {
+        const response = await fetch("/songs");
+        const songs = await response.json();
+        document.getElementById("songsTable").innerHTML = "";
+        songs.forEach(song => {
+            const row = `<tr>
+                <td>${song.id}</td>
+                <td>${song.title}</td>
+                <td>${song.artist}</td>
+                <td>${song.url ? `<a href="${song.url}" target="_blank">Tinglash</a>` : "Yo‘q"}</td>
+            </tr>`;
+            document.getElementById("songsTable").innerHTML += row;
+        });
+    }
+
+    fetchSongs();
+</script>
+</body>
+</html>
