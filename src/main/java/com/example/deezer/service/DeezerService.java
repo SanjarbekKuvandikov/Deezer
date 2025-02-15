@@ -1,56 +1,39 @@
 package com.example.deezer.service;
 
-import com.example.deezer.entity.Song;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.example.deezer.dto.DeezerResponse;
+import com.example.deezer.dto.SongDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DeezerService {
-public Song searchSongs(String query) {
+public List<SongDTO> searchSongs(String query) {
     try {
         String apiURL = "https://api.deezer.com/search?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8);
         RestTemplate restTemplate = new RestTemplate();
 
-        String response = restTemplate.getForObject(apiURL, String.class);
+        DeezerResponse response = restTemplate.getForObject(apiURL, DeezerResponse.class);
 
-        if (response == null){
-            System.out.println("API is empty");
-            return null;
+        //check response is not null and contains songs
+        if (response == null ||response.getData() == null || response.getData().isEmpty()) {
+            System.out.println("No data found");
+            return List.of();
         }
-
-        JsonObject jsonObject = JsonParser.parseString(response).getAsJsonObject();
-
-        //data is existed
-        if (!jsonObject.has("data") || jsonObject.get("data").isJsonNull()){
-            System.out.println("Json data is null");
-            return null;
-        }
-
-        JsonArray data = jsonObject.getAsJsonArray("data");
-
-        if (data.isEmpty()){
-            System.out.println("Json data is empty");
-            return null;
-        }
-
-            JsonObject firstSong = data.get(0).getAsJsonObject();
-
-            String title = firstSong.has("title") ? firstSong.get("title").getAsString() : "null";
-            String author = firstSong.has("artist") && firstSong.getAsJsonObject("artist").has("name")
-                    ? firstSong.getAsJsonObject("artist").get("name").getAsString()
-                    : "null";
-            return new Song(title, author, "");
+        //convert API response to List
+        return response.getData().stream()
+                .map(song -> new SongDTO(song.getTitle(),
+                        (song.getArtist() !=null) ? song.getArtist().getName() : "unkown"))
+                .collect(Collectors.toList());
 
     }catch (Exception e){
         e.printStackTrace();
         System.out.println("Error" + e.getMessage());
-        return null;
+        return List.of();
     }
 }
 }
