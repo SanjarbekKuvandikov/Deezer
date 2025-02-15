@@ -1,5 +1,6 @@
 package com.example.deezer.controller;
 
+import com.example.deezer.dto.SongDTO;
 import com.example.deezer.entity.Song;
 import com.example.deezer.repository.SongsRepository;
 import com.example.deezer.service.DeezerService;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/songs")
@@ -24,9 +26,8 @@ public class SongController {
 
     //find song and save
     @PostMapping("/search")
-    public Song searchAndSave(@RequestParam("query") String query){
-        Song song = deezerService.searchSongs(query);
-        return songsRepository.save(song);
+    public List<SongDTO> searchAndSave(@RequestParam("query") String query){
+        return deezerService.searchSongs(query);
     }
 
     //Get all songs
@@ -46,6 +47,20 @@ public class SongController {
     @GetMapping("/no-url")
     public List<Song> getSongsWithoutUrl(){
      return songsRepository.findByUrlIsNullOrUrl("");
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<String> saveSong(@RequestBody Map<String, String> requestBody){
+        String title = requestBody.get("title");
+        String artist = requestBody.get("artist");
+        String url = requestBody.get("url");
+
+        if (title == null || artist == null || url == null){
+            return ResponseEntity.badRequest().body("Title,artist and url are required");
+        }
+        Song song = new Song(title, artist, url);
+        songsRepository.save(song);
+        return ResponseEntity.ok("Song saved successfully");
     }
 
 }
