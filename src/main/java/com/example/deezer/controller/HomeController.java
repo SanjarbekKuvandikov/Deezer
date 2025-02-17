@@ -21,5 +21,4 @@ public class HomeController {
     public String noUrl() {
         return "no_url";
     }
-
 }
