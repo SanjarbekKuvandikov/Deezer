@@ -1,4 +1,4 @@
-package com.example.deezer.dto;
+package com.example.deezer.dto.data;
 
 import lombok.Getter;
 import lombok.Setter;
